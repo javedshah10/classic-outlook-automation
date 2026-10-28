@@ -7,7 +7,7 @@ Nothing is ever sent for you. Your mail stays on your PC, apart from whatever yo
 ## What you need
 - Windows with **Classic Outlook** (the desktop app) signed in to your account. The "New Outlook" does not work: it has no automation interface.
 - Windows PowerShell 5.1 (built in).
-- An AI agent that can run shell commands and read files, for example Claude Code.
+- An AI agent that can run shell commands and read and write files. It is not tied to one product: Claude Code, Codex, OpenCode, Cursor or similar tools should all work, because the scripts are plain PowerShell and `CLAUDE_PROMPT.md` is plain text (the name is only a label). I built and tested it with Claude Code; the others follow the same steps but I have not tested them.
 
 ## Quick start
 1. Run `.\set_email.ps1 -NewEmail you@yourdomain.com` to put your Outlook address into every script (or edit `$TargetEmail` in each `.ps1`).
