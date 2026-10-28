@@ -33,12 +33,15 @@ Nothing is ever sent for you. Your mail stays on your PC, apart from whatever yo
 | `delete_marked.ps1` | Deletes the rows you mark `Triage_Status = Delete` in the CSV; the row stays as `Closed` |
 | `delete_mail.ps1` | Deletes Inbox or Junk mail by sender and/or subject (`-Sender @domain.com`, `name@domain.com` or text) |
 | `compose_mail.ps1` | Opens a new email in an Outlook compose window with To, Cc, subject and text filled in; your own signature is added and you press Send |
+| `search_mail.ps1` | Finds an email of any age in any mail folder (Inbox, Sent, Junk, Deleted, Archive, subfolders) by sender, subject, body words or date. Read-only; `-Id <ID> -Save` copies one into the local files for the agent |
 | `junk_stats.ps1` | Read-only Junk folder statistics and a short list with an ID per email |
 | `move_from_junk.ps1` | Moves chosen emails from Junk back to the Inbox and records them in the CSV as `New` |
 
 Examples:
 ```powershell
 .\inbox_stats.ps1 -Days 2
+.\search_mail.ps1 -Sender supplier.com -Since 2026-01-01        # find an old email; read-only
+.\search_mail.ps1 -Sender supplier.com -Id S1A2B3C4D -Save       # same filters + the ID: copy it into emails\ and the CSV
 .\compose_mail.ps1 -To a@example.com -Cc b@example.com -Subject "Hello" -Body "Text" -DryRun   # checks only; drop -DryRun to open the compose window
 .\delete_mail.ps1 -Folder Junk -Sender spam-domain.com          # dry run
 .\delete_mail.ps1 -Folder Junk -Sender spam-domain.com -Apply
@@ -53,7 +56,7 @@ Examples:
 The CSV has `Has_Attachment` (`Yes` / `No`), `Attachment_Count` and `Attachment_Files` (file **names** only), and `active_context.md` marks such emails with `Attachment: YES` so Claude flags them instead of guessing what they contain. Attachments are not downloaded or read. Saving and reading them is not included in this version.
 
 ## Known limits
-- Only the Inbox is synced. Junk is never synced; use the stats and rescue scripts.
+- Only the Inbox is synced. Junk is never synced; use the stats and rescue scripts. Older mail, mail in other folders and deleted mail is found with `search_mail.ps1`.
 - Mail that arrives more than 2 days older than the watermark is not seen by the sync.
 - Outlook must be open and loaded. A freshly started Outlook can return an empty first scan; the sync warns and retries once.
 - Outlook's own junk filter can move a rescued email back to Junk. Add the sender to Safe Senders in Outlook.
