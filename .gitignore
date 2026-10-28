@@ -1,0 +1,11 @@
+# Your mail and generated files stay on your PC. Never commit them.
+data/*
+!data/.gitkeep
+emails/*
+!emails/.gitkeep
+drafts/*
+!drafts/.gitkeep
+attachments/
+backups/
+active_context.md
+*.bak
