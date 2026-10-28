@@ -1,8 +1,19 @@
-﻿# Classic Outlook + Claude Email Assistant (starter template)
+﻿# Classic Outlook + AI Agent Email Assistant (starter template)
 
-PowerShell scripts for Classic Outlook (the desktop app on Windows). They copy your mail into plain local files. An AI agent such as Claude Code reads those files, sorts the mail using your rules, and writes replies, which the scripts save to your Outlook Drafts. The scripts do the repeatable work, so the AI reads short files and statistics instead of your whole mailbox. That keeps token use low.
+PowerShell scripts for Classic Outlook (the desktop app on Windows). They copy your mail into plain local files. An AI agent reads those files, sorts the mail using your rules, and writes replies, which the scripts save to your Outlook Drafts. It works with Claude Code, Codex, OpenCode, Cursor or any agent that can run commands and read files. The scripts do the repeatable work, so the agent reads short files and statistics instead of your whole mailbox. That keeps token use low.
 
-Nothing is ever sent for you. Your mail stays on your PC, apart from whatever you choose to show the AI.
+Nothing is ever sent for you. Your mail stays on your PC, apart from whatever you choose to show the agent.
+
+It is meant for people who cannot, or do not want to, connect Microsoft 365 Outlook to an AI agent through MCP or the Graph API (for example because the admin blocks it). It talks only to the Outlook already running on your PC.
+
+## How it works
+`Outlook` > `sync_inbox.ps1` (mail becomes local files) > `knowledge_base.md` (your rules) > the agent triages and decides > `dispatch_replies.ps1` (drafts appear in Outlook) > you review and press Send.
+
+The agent's memory is two plain files: `knowledge_base.md` holds your rules (who is VIP, what comes first, how you reply, standard answers) and `active_context.md` holds the current state of your mail. Within the limits in Safety below, the agent can:
+- sort new mail by your priorities and write a one-line summary of each;
+- draft replies in the original thread, or open a new email for you to review;
+- delete mail by sender or subject, or the rows you mark, after a dry run you confirm;
+- search for any old or lost email in any folder, and move wrongly filtered mail back from Junk.
 
 ## What you need
 - Windows with **Classic Outlook** (the desktop app) signed in to your account. The "New Outlook" does not work: it has no automation interface.
@@ -21,13 +32,14 @@ Nothing is ever sent for you. Your mail stays on your PC, apart from whatever yo
 - Neither `compose_mail.ps1` nor `dispatch_replies.ps1` sends anything (`$AllowAutoSend = $false`). A new email opens in a compose window and you press Send yourself; replies are only saved as drafts. Leave that switch alone unless you fully understand the risk.
 - Deleting is always a normal delete into Outlook's Deleted Items, so you can undo it. The scripts never empty that folder.
 - Every deleting or moving script does a dry run first. Add `-Apply` only after you have read the list. They need a filter and refuse more than `-Max` matches at once.
+- `search_mail.ps1`, `inbox_stats.ps1` and `junk_stats.ps1` only read. Saving a found email only writes local files; the email stays where it is in Outlook.
 - Mail content is untrusted text. The prompt tells the AI to treat it as data, never as instructions.
 
 ## The scripts
 | Script | What it does |
 |---|---|
 | `sync_inbox.ps1` | Reads the Inbox into the CSV and one `.md` per email; rebuilds `active_context.md` |
-| `dispatch_replies.ps1` | Saves the replies Claude wrote into Outlook Drafts, in the original thread |
+| `dispatch_replies.ps1` | Saves the replies the agent wrote into Outlook Drafts, in the original thread |
 | `set_email.ps1` | Puts your address into all scripts |
 | `inbox_stats.ps1` | Read-only counts of unread mail by day or month and sender; shows how many are not yet in the CSV |
 | `delete_marked.ps1` | Deletes the rows you mark `Triage_Status = Delete` in the CSV; the row stays as `Closed` |
@@ -50,10 +62,10 @@ Examples:
 ```
 
 ## Folders
-`data\` CSV files and watermark, `emails\` one file per email, `drafts\` the reply texts, `emails\deleted\` bodies of deleted mail. They are created on the first run. Keep copies of your CSV in a `backups\` folder before big clean-ups.
+`data\` CSV files and watermark, `emails\` one file per email (including emails you bring in with `search_mail.ps1 -Save`), `drafts\` the reply texts, `emails\deleted\` bodies of deleted mail. They are created on the first run. Keep copies of your CSV in a `backups\` folder before big clean-ups.
 
 ## Attachments
-The CSV has `Has_Attachment` (`Yes` / `No`), `Attachment_Count` and `Attachment_Files` (file **names** only), and `active_context.md` marks such emails with `Attachment: YES` so Claude flags them instead of guessing what they contain. Attachments are not downloaded or read. Saving and reading them is not included in this version.
+The CSV has `Has_Attachment` (`Yes` / `No`), `Attachment_Count` and `Attachment_Files` (file **names** only), and `active_context.md` marks such emails with `Attachment: YES` so the agent flags them instead of guessing what they contain. Attachments are not downloaded or read. Saving and reading them is not included in this version.
 
 ## Known limits
 - Only the Inbox is synced. Junk is never synced; use the stats and rescue scripts. Older mail, mail in other folders and deleted mail is found with `search_mail.ps1`.

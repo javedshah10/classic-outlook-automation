@@ -1,11 +1,12 @@
 # Classic Outlook + LLM Email Automation Solution
-**Zero-Admin, Flat-File Architecture (PowerShell COM + CSV/Markdown + Claude)**
+**Zero-Admin, Flat-File Architecture (PowerShell COM + CSV/Markdown + any AI agent, e.g. Claude Code)**
 
 > **Read this first - what changed since this document was written.** The `.ps1` files in the folder are the source of truth; the script listings below are an older design snapshot.
 > - `sync_inbox.ps1` keeps a watermark (`data/last_scan.json`) and rescans **read and unread** mail from `$LookbackDays` (2) before it; IDs already in the CSV are skipped, so repeat runs add no duplicates. Mail already read in Outlook is saved as `Ignored`. It logs the inbox size and retries once if Outlook looks half-loaded.
 > - `delete_marked.ps1` deletes mail you mark `Triage_Status = Delete` (dry run first, then `-Apply`): the email goes to Outlook Deleted Items, the body file moves to `emails/deleted/`, and the row stays as `Closed`.
 > - `compose_mail.ps1` opens a new email in an Outlook compose window (To/Cc/subject/text filled in, your signature added by Outlook); you press Send. It never sends.
 > - `delete_mail.ps1` deletes Inbox or Junk mail by sender and/or subject (dry run first, `-Max` guard, Deleted Items only) and closes matching CSV rows.
+> - `search_mail.ps1` finds an email of any age in any mail folder (Inbox and subfolders, Sent, Junk, Deleted, Archive...) by sender, subject, body words or date. It is read-only; `-Id <ID> -Save` copies one email into `emails/` and the CSV as `New` and leaves it where it is in Outlook.
 > - `inbox_stats.ps1` gives read-only stats for unread Inbox mail (counts, senders, and how many are not yet in the CSV).
 > - `junk_stats.ps1` and `move_from_junk.ps1` give read-only stats for the Outlook Junk folder and move chosen emails back to the Inbox (dry run first, then `-Apply`); a moved email is recorded in the CSV as `New` with its `.md`. Other junk mail is never synced or saved.
 > - The CSV has `Has_Attachment` (`Yes`/`No`), `Attachment_Count` and `Attachment_Files`; `active_context.md` marks emails with attachments as `Attachment: YES` so they can be checked.
