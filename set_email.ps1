@@ -18,9 +18,16 @@ if (-not $m) { Write-Host "Could not find the `$TargetEmail line in sync_inbox.p
 $OldEmail = $m.Matches[0].Groups[1].Value
 Write-Host "Current address: $OldEmail" -ForegroundColor Cyan
 
+# Show the accounts Classic Outlook itself reports, so you can copy the right address (skipped quietly if Outlook is not open)
+$found = @()
+try { foreach ($a in (New-Object -ComObject Outlook.Application).GetNamespace("MAPI").Accounts) { $found += [string]$a.SmtpAddress } } catch { }
+if ($found.Count) { Write-Host "Accounts found in your Outlook (use one of these exactly):" -ForegroundColor Cyan; $found | ForEach-Object { Write-Host "  $_" } }
+else { Write-Host "Could not read the account list (is Classic Outlook open?). Use the address shown in Outlook under File > Account Settings." -ForegroundColor Yellow }
+
 if (-not $NewEmail) { $NewEmail = Read-Host "Enter your Outlook email address" }
 $NewEmail = $NewEmail.Trim()
 if ($NewEmail -notmatch '^[^@\s"]+@[^@\s"]+\.[^@\s"]+$') { Write-Host "'$NewEmail' doesn't look like an email address. Nothing changed." -ForegroundColor Red; exit 1 }
+if ($found.Count -and ($found -notcontains $NewEmail)) { Write-Host "Warning: '$NewEmail' is not one of the Outlook accounts listed above. The scripts will say 'Account ... not found' unless it matches one exactly." -ForegroundColor Yellow }
 if ($NewEmail -ieq $OldEmail) { Write-Host "That is already the current address. Nothing changed." -ForegroundColor Yellow; exit 0 }
 
 # Solution files in this folder only (not the data/emails/drafts output folders)

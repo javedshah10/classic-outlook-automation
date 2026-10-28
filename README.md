@@ -21,7 +21,7 @@ The agent's memory is two plain files: `knowledge_base.md` holds your rules (who
 - An AI agent that can run shell commands and read and write files. It is not tied to one product: Claude Code, Codex, OpenCode, Cursor or similar tools should all work, because the scripts are plain PowerShell and `CLAUDE_PROMPT.md` is plain text (the name is only a label). I built and tested it with Claude Code; the others follow the same steps but I have not tested them.
 
 ## Quick start
-1. Run `.\set_email.ps1 -NewEmail you@yourdomain.com` to put your Outlook address into every script (or edit `$TargetEmail` in each `.ps1`).
+1. Run `.\set_email.ps1` (with Outlook open). It lists the accounts Outlook has, then puts the address you choose into every script (`.\set_email.ps1 -NewEmail you@yourdomain.com` skips the question; or edit `$TargetEmail` in each `.ps1`). The address must match the account exactly as Outlook shows it under File > Account Settings. Only that one account is used, so with several accounts pick the one whose mail you want handled.
 2. Fill in the placeholders in `knowledge_base.md`: your name and role, who counts as VIP, how to classify mail, your standard answers.
 3. Keep Classic Outlook open and fully loaded, then run `.\sync_inbox.ps1`.
    - The first run reads your unread Inbox mail and creates `data\master_YYYY_MM.csv`, `emails\*.md`, `data\last_scan.json` (the watermark) and `active_context.md`.
